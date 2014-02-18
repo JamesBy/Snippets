@@ -1,0 +1,174 @@
+<!--
+-----------------------------------------------------------------------------------------
+--
+-- index.html
+--
+-----------------------------------------------------------------------------------------
+-- Project: jQuery Mobile Assignment
+--
+-- Description: Webelevate 2.1 FPS Corona Symester 2 Project
+-- 
+-- Developer:James Byrne - James.Byrne@webelevate.ie
+--	
+-- Student Number - D12127553
+--
+-- Version: 1.0
+-- 
+--
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+The app incorporates the following features.  
+1. Based on Mobile jQuery
+2. Present the user with an input box to filter the full list
+3. Use your own customized theme (ThemeRoller is fine but feel free to do something yourself if you prefer)
+4. Customize some of the default components, e.g. buttons, etc.
+5. Clicking on any list item (regardless of whether it is in the full or the filtered list) should use some page transition to present a "page" with extra content specific to that item.  
+6.  Use only one single HTML file for the main content and functionality
+7.  Assume that your app could be wired up to some server side data feed, but build it using mockup client side content (i.e. clearly indicate in your comments the portions of the code that you think should be dynamic if the app were using live data.
+		**********************Each Item of content is an object stored in the content1.inc.js file
+		**********************Each item is loaded Dynamcally. This functionality could easily be swapped out for live json fed objects.
+8.  A collapsable side panel with some info about your app.  e.g. usage instructions or something similar.
+
+-------------------------------------------------------------------------------------------
+-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>Vehicular Details</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+  
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile.structure-1.3.2.min.css" /> 
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script> 
+  <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script> 
+  
+
+  <link rel="stylesheet" href="css/myOwnTheme.css" />
+  <script src ="js/content/content1.inc.js"></script>
+  <link rel="stylesheet" href="css/mycss.css"/>
+  
+
+
+<script>
+
+
+//Swipe right handler function. Swipe right to open the info panel
+
+$(function(){
+  // Bind the swipeHandler callback function to the swipe event on div.box
+  $( document ).on( "swiperight", swipeHandler );
+ 	
+  // Callback function references the event target and adds the 'swipe' class to it
+  function swipeHandler( event ){
+    $( "#myPanel" ).panel( "open" );
+    //change the text prompt
+    $('#swipetext').html('<h3>Tap to close panel</h3>');
+ 
+  }
+});
+
+
+//When the panel closes change the text back
+$( document ).on( "panelclose", function( event, ui ) {
+      $('#swipetext').html('<h3>Swipe For Info --->>></h3>');
+ 
+});
+
+ 
+
+//Populate the list when the second page opens. The list is populated using the 
+//content (categoryData) from the  js/content/content1.inc.js file.
+//This content is stored in a simular manner to a json object, an array of name value pairs.   
+$( document ).on( "pageinit", "#listPage", function( event ) {
+
+	var str;
+	var categoryDataNumber
+
+	$( categoryData ).each(function( index ) {
+	   	str = "<li><a href=\"#descriptionPage\" onClick=\"sessionStorage.myid="+index+"\" data-transition=\"slidefade\"><img src=\"img/vpics/vpicsmall/"+ categoryData[index].image + ".png\"> ";
+		str += " <h1 style=\"text-align:left;\"> " + categoryData[index].name + " </h1><p> "; 
+		str += categoryData[index].quickDescription + " </p></a></li> ";
+
+		$("#thelistview").append(str);
+		$("#thelistview").listview("refresh");
+		
+	});
+    
+});
+  
+
+//When the item from the list is picked the id of the item is stored in the session Storage variable
+//we access this variable here and populate the description page with the heading, picture and text for that item.
+$( document ).on( "pageshow", "#descriptionPage", function( event ) {
+  objId=sessionStorage.myid
+  $('#descriptionPic').html('<img class=\"descriptionImg\" src=\"img/vpics/' + categoryData[objId].image + '.jpg\"/>');
+  $('#descriptionHeader').html('<h1>'+categoryData[objId].name+'</hi>'); 
+  $('#descriptionTxt').html('<br>'+categoryData[objId].description+'<br>');
+ 
+});
+
+</script>
+
+
+
+</head>
+<body>
+<!--This is the HTML for the app. This contains the static markup for three seperate pages 
+--Page 1 contains the panel with info for the app, Page 2 initialises the ul which is then populated
+--when the page loads. Page 3 sets up for the dynamic loading of the appropriate item details-->
+
+<div data-role="page" id="landingPage" data-theme="a" data-transition="fade">
+ 	<div data-role="panel" id="myPanel">
+    <h2>List App</h2><h3><p>Click 'Show me the List!' to see a list if items displayed with pictures.</p><p>You can filter this list using the filter search box.</p><p>Click on an item on the list to see the next page with further details about the item pressed.</p></h3><!-- panel content goes here -->
+	</div><!-- /panel -->
+ 	<div data-role="header">
+		<h1>Vehicle Details</h1>
+		<title>Vehicle Details</title>
+	</div> 
+	<div data-role="content" id="content">
+		<h1>Welcome</h1>
+		<p><a href="#listPage" data-role="button">Show me the List!</a></p>	
+		<div><br><br><br><br><br><br><br><br><br><br><br><div id="swipetext" style="text-color:#C0C0C0"><h3>Swipe For Info --->>></h3></div></div>
+
+	</div><!-- /content -->
+</div> 
+
+
+<div data-role="page" id="listPage" data-theme="a" data-transition="slideup">
+
+	<div data-role="header">
+		<h1>List Page!</h1>
+	</div>
+
+	<div id="p1content" data-role="content">
+		<!--initialise the ul The data-filter attribute automatically inserts the list filter 
+			functionality-->	
+		<ul id="thelistview" data-role="listview" data-inset="true" data-filter="true"></ul>
+	</div>
+
+</div> 
+
+<div data-role="page" id="descriptionPage" data-theme="a" data-transition="flip">
+
+	<div data-role="header" id="descriptionHeader">
+		<h1>Your Chosen Item</h1>
+	</div>
+	<!--this div is set up for a nice responsive layout. Side by side on wide screen
+		and one over the other on a narrow (phone) screen-->
+	<div class="ui-grid-a ui-responsive" data-role="content">
+		<div class="ui-block-a" >
+			<div class="parent" id="descriptionPic">
+   				<span class="clear"></span>
+			</div>
+		</div>
+		<div class="ui-block-b descriptionTxtclass" id="descriptionTxt"></div>
+	</div><!-- /grid-a -->
+
+</div> 
+
+	</body>
+</html>
